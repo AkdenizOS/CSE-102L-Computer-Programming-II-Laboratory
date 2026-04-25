@@ -1,0 +1,171 @@
+Laboratory Manual: Water Purification System Simulation
+Welcome to your Object-Oriented Programming laboratory assignment. In this session, you will design the architecture for a water purification plant. This exercise is designed to reinforce your understanding of core OOP principles, including Encapsulation, Inheritance, Abstract Classes, Interfaces, Polymorphism, and 2D Array manipulation.
+
+Please read the instructions carefully. Your system will be evaluated using an automated test suite based on strict structural and mathematical requirements. The Main execution file will be provided by the testing system.
+
+Objectives
+Build a robust class hierarchy representing different physical filters.
+
+Implement interfaces to categorize object capabilities based on waste retention.
+
+Manage object states and interactions as they pass through a simulated pipeline grid (2D array).
+
+Grading Rubric (Total: 100 Points)
+Your submission will be evaluated based on the following automated point distribution:
+
+Category 1: Getters, Setters, and Constructors (Max 13 Points)
+
+WaterVolume core functionalities: 10 tests x 1.0 pt = 10 Points.
+
+TreatmentUnit core functionalities: 3 tests x 1.0 pt = 3 Points.
+
+Category 2: Architecture and Type Verification (3 Points)
+
+Inheritance and Interface checks: 6 tests x 0.5 pt = 3 Points.
+
+Category 3: Core Treatment Logic - processWater (44 Points)
+
+Chlorinator Algorithm: 4 tests x 2.0 pts = 8 Points.
+
+CarbonFilter Algorithm: 6 tests x 2.5 pts = 15 Points.
+
+ReverseOsmosis Algorithm: 5 tests x 3.0 pts = 15 Points.
+
+General Laboratory Scenario validation: 1 test x 6.0 pts = 6 Points.
+
+Category 4: System Management (40 Points)
+
+TreatmentCenter execution and mathematical integration (runSystem, calculateTotalWaste): 10 tests x 4.0 pts = 40 Points.
+
+System Architecture Requirements
+You are required to create the following components. Ensure that all class names, method names, and parameter types match these descriptions exactly. Do not use import statements unless specifically instructed.
+
+1. The Data Carrier: WaterVolume
+This class represents the physical water traveling through your plant pipelines.
+
+Attributes: Define two private fields of type double: mineralRate and pollutionAmount.
+
+Constructor: Create a constructor that accepts two double parameters (in the order of mineral rate, then pollution amount) to initialize the object's state.
+
+Behaviors: Implement standard public getter and setter methods for both attributes: getMineralRate, setMineralRate, getPollutionAmount, and setPollutionAmount.
+
+2. The Capability Interface: WasteRetainer
+Some units physically trap dirt, while others only change the water chemically. We need a way to group the units that trap physical waste.
+
+Structure: Create an interface named WasteRetainer.
+
+Method: Declare a single method named getRetainedWaste that takes no parameters and returns a double.
+
+3. The Blueprint: TreatmentUnit
+This is the foundational component for every machine in the facility.
+
+Structure: Create an abstract class named TreatmentUnit.
+
+Attributes: Define a private String field named name.
+
+Constructor: Accept a String parameter to initialize the name attribute.
+
+Behaviors:
+
+Provide a public getter method named getName returning a String.
+
+Declare a public abstract method named processWater. This method must return void and accept a single parameter of type WaterVolume (name the parameter water).
+
+Concrete Treatment Units
+You will now design the specific machines by extending your blueprint.
+
+A. Chlorinator
+Inheritance: Extends TreatmentUnit.
+
+Constructor: Accepts a String name and passes it to the parent constructor.
+
+Logic (processWater): This unit does not clean pollution. It simply adds exactly 15.0 to the water's current mineralRate.
+
+B. CarbonFilter
+Inheritance: Extends TreatmentUnit and implements WasteRetainer.
+
+Attributes: Needs a private double field named retainedWaste, initialized to 0.0.
+
+Constructor: Accepts a String name and passes it to the parent constructor.
+
+Logic (processWater): This filter removes 30 percent (0.30) of the water's current pollutionAmount. You must subtract this calculated amount from the water object and add it to the filter's internal retainedWaste tracker. It does not affect the mineral rate.
+
+Interface: Implement getRetainedWaste to return the internal tracking variable.
+
+C. ReverseOsmosis
+Inheritance: Extends TreatmentUnit and implements WasteRetainer.
+
+Attributes: Needs a private double field named retainedWaste, initialized to 0.0.
+
+Constructor: Accepts a String name and passes it to the parent constructor.
+
+Logic (processWater): This aggressive filter removes 10 percent (0.10) of the water's current pollutionAmount, transferring it to its retainedWaste tracker. Additionally, it divides the water's current mineralRate exactly by 2.0.
+
+Interface: Implement getRetainedWaste to return the internal tracking variable.
+
+The Facility Manager: TreatmentCenter
+This central class manages the physical pipeline grids.
+
+Attributes:
+
+A private 2-dimensional array of TreatmentUnit named pools.
+
+A private 1-dimensional array of WaterVolume named sources.
+
+Constructor: Accepts both arrays (TreatmentUnit[][] pools, WaterVolume[] sources) and assigns them to the class attributes.
+
+Method: runSystem
+
+Returns void and takes no parameters.
+
+Iterate over the 2D pools grid row by row.
+
+The WaterVolume object located at sources[i] must sequentially visit every TreatmentUnit in the corresponding pools[i] row.
+
+After a water source completes its journey through an entire row, print its final state to the console exactly as follows (where i is the row index): Line [i] Output Mineral Rate: [final_mineral_value] Line [i] Output Pollution Amount: [final_pollution_value] (followed by a newline character \n).
+
+Method: calculateTotalWaste
+
+Returns a double and takes no parameters.
+
+Iterate through all units in the entire 2D grid. Identify which units are capable of holding waste (use the appropriate OOP keyword). Downcast them appropriately, sum up all their retained waste, and return the final total.
+
+Edge Cases and Boundary Conditions
+To achieve a perfect score, your system must handle the following edge cases robustly, as evaluated by the automated test suite:
+
+Extreme and Zero Inputs: Your WaterVolume class must safely handle extreme values (e.g., 99999.9) and exact zero values (0.0) for both mineral rate and pollution amount without causing calculation errors.
+
+Attribute Independence: Modifying a water volume's mineral rate must never inadvertently alter its pollution amount, and vice versa. They must remain completely independent.
+
+Zero-State Processing: If a water volume with 0.0 pollution enters a CarbonFilter, the retained waste should remain unchanged. If a water volume with 0.0 minerals enters a ReverseOsmosis unit, halving the minerals should cleanly result in 0.0.
+
+Cumulative Processing: Waste-retaining units must accurately accumulate trapped waste over time. If multiple water volumes (or the same water volume multiple times) pass through a single CarbonFilter or ReverseOsmosis unit, its retainedWaste attribute must hold the cumulative sum of all absorbed pollution.
+
+Empty Array Handling: If the TreatmentCenter is initialized with empty arrays for the pools or the sources, calling runSystem must not crash the program (do not throw out-of-bounds or null pointer exceptions).
+
+Pre-Execution State: If calculateTotalWaste is called before runSystem has been executed, it must safely return 0.0, even if the facility contains waste-retaining units.
+
+Pipeline Independence: In the TreatmentCenter, water flowing through one pipeline (row) must not affect the mineral or pollution levels of water flowing through a different parallel pipeline.
+
+Mathematical System Integrity: The testing suite strictly verifies the law of conservation within your simulation. The total initial pollution of all water entering the system must perfectly equal the sum of the final pollution leaving the system plus the total waste trapped by all filters.
+
+Example Scenario for Self-Verification
+Before submitting, trace this mathematical scenario on paper to ensure your logic is sound:
+
+A WaterVolume starts with 100.0 pollution and 40.0 minerals.
+
+It enters a CarbonFilter.
+
+It loses 30 percent of its pollution (30.0). The filter stores this 30.0.
+
+Water status: 70.0 pollution, 40.0 minerals.
+
+It immediately enters a ReverseOsmosis unit.
+
+It loses 10 percent of its current 70.0 pollution (7.0). The unit stores this 7.0.
+
+The minerals are halved (40.0 / 2.0 = 20.0).
+
+Final water status: 63.0 pollution, 20.0 minerals.
+
+If you call calculateTotalWaste() on this specific system, it should return 37.0 (30.0 + 7.0). Ensure that your system's initial total pollution (100.0) is always equal to the final output pollution (63.0) plus the total retained waste (37.0).

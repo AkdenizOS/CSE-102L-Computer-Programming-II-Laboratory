@@ -1,0 +1,28 @@
+public class Main {
+    public static void main(String[] args) {
+        
+        WaterVolume[] waters = {
+            new WaterVolume(40.0, 100.0),
+            new WaterVolume(60.0, 100.0),
+            new WaterVolume(80.0, 100.0)
+        };
+
+        TreatmentUnit[][] facilityPools = {
+            { new CarbonFilter("Filter1"), new ReverseOsmosis("Osmosis1"), new Chlorinator("Chlorine1"), new CarbonFilter("Filter2") },
+            { new ReverseOsmosis("Osmosis2"), new ReverseOsmosis("Osmosis3"), new Chlorinator("Chlorine2"), new Chlorinator("Chlorine3") },
+            { new CarbonFilter("Filter3"), new CarbonFilter("Filter4"), new CarbonFilter("Filter5"), new Chlorinator("Chlorine4") }
+        };
+
+        TreatmentCenter center = new TreatmentCenter(facilityPools, waters);
+
+        System.out.println("--- SIMULATION STARTING ---\n");
+        center.runSystem();
+
+        System.out.println("--- STATISTICS ---");
+        double totalWaste = center.calculateTotalWaste();
+        System.out.println("Total Waste Retained by the Entire Facility: " + totalWaste);
+        
+        double validation = waters[0].getPollutionAmount() + waters[1].getPollutionAmount() + waters[2].getPollutionAmount() + totalWaste;
+        System.out.println("System Validation (Total Entering Pollution 300.0 = Outputs + Retained Waste): " + validation);
+    }
+}

@@ -1,0 +1,155 @@
+Laboratory Task: Port Management Simulation
+Objective
+In this assignment, you will simulate a Port Management System. Your objective is to create a logistics mechanism that assigns cargo containers to appropriate ships. The system requires intelligent routing based on cargo types (e.g., Standard vs. Chemical) and a "Best Fit" space allocation algorithm to ensure safe and optimized loading.
+
+1. Class Structure: Ship
+The Ship class represents a maritime transport vessel. It tracks its cargo capacity, current load, and the specific type of cargo it is permitted to carry.
+
+Important Note: This class must not be an inner class. It should be defined as a separate, non-public class in your file.
+
+Attributes:
+
+id (Integer): Unique identifier for the ship.
+
+type (Integer): Represents the cargo type the ship can carry (e.g., 1 for Standard, 2 for Chemical).
+
+capacity (Double): The maximum total weight the ship can hold.
+
+currentLoad (Double): The total weight of cargo currently loaded on the ship.
+
+Constructor:
+
+Requires id, type, and capacity upon creation.
+
+The currentLoad should be initialized to zero by default.
+
+Methods to Implement:
+
+getFreeSpace(): Returns a Double representing the remaining weight capacity on the ship (capacity minus current load).
+
+addLoad(weight): Accepts a Double parameter representing the weight of a new container. It increases the currentLoadof the ship by this amount. Does not return anything.
+
+toString(): Returns a String summarizing the ship's status. For example: "Ship 1 [Type:1] Load:0.0/50.0"
+
+2. Class Structure: Container
+The Container class represents a single unit of cargo that needs to be loaded onto a ship.
+
+Important Note: Just like the Ship class, this must not be an inner class. It must be a separate, non-public class.
+
+Attributes:
+
+weight (Double): The physical weight of the container.
+
+type (Integer): Represents the type of cargo inside (e.g., 1 for Standard, 2 for Chemical).
+
+isLoaded (Boolean): A status flag indicating if the container was successfully assigned to a ship (defaults to false).
+
+Constructor:
+
+Requires weight and type upon creation.
+
+The isLoaded flag should be initialized to false.
+
+Core Method: assignToShip(ships) This method (which returns nothing) acts as the port's logistics controller. It takes an array of Ship objects as a parameter and tries to find the most suitable vessel for the container.
+
+Functional Requirements & Behavior:
+
+Iterate the Array: You must loop through the ships array to evaluate available vessels.
+
+Null Safety: The port array might contain empty docks (null references). Safely skip these without causing errors.
+
+Rule 1 - Type Matching (Strict Rule): A container can only be placed on a ship of the exact same type. If the typevalues do not match, you must skip that ship.
+
+Rule 2 - Best Fit Algorithm: Among the ships that have the correct type and enough free space to hold the container's weight, you must find the one with the most available free space. Do not just pick the first available ship; evaluate all valid options to find the absolute "best fit".
+
+Loading the Cargo: * If a suitable ship is found: Call the ship's addLoad method, mark the container's isLoaded flag as true, and print a success message.
+
+If no suitable ship is found (due to type mismatches or lack of capacity): Print a failure message.
+
+3. Console Output Requirements
+Your assignToShip method must print specific messages to the console based on the outcome. Please strictly follow these formats for the automated grading tests:
+
+Upon successful assignment: "Container [weight] -> Ship [id]" (Example: Container 60.0 -> Ship 3)
+
+If assignment fails: "Container [weight] -> Failed" (Example: Container 50.0 -> Failed)
+
+4. Example Scenario
+The Container:
+
+Weight: 60.0 Tons
+
+Type: 1 (Standard Cargo)
+
+The Port Array (Available Ships):
+
+Index 0: Ship ID: 1, Type: 1, Capacity: 50.0. Current Free Space: 50.0.
+
+Index 1: Ship ID: 2, Type: 2, Capacity: 100.0. Current Free Space: 100.0.
+
+Index 2: Ship ID: 3, Type: 1, Capacity: 80.0. Current Free Space: 80.0.
+
+System Decision & Logic:
+
+Evaluate Index 0: Type matches (1 == 1). However, free space (50.0) is less than container weight (60.0). Cannot load here.
+
+Evaluate Index 1: Type mismatch (2 != 1). Skip.
+
+Evaluate Index 2: Type matches (1 == 1). Free space (80.0) is greater than the container weight (60.0). This is a valid option.
+
+Result: Since Ship 3 is the only valid ship with enough space, it is selected as the best fit.
+
+Expected Console Output for this Scenario:
+
+Container 60.0 -> Ship 3
+
+5. Main Class: PortSimulation
+This is the main, public entry point of your application. You will use this class to create an array of Ship objects, instantiate a Container, invoke the assignment method, and print the final status of all ships. This must be the only public class in your file.
+
+6. Important: Edge Cases & Boundary Conditions The automated grading system will test your code against various edge cases. To get full points, your code must explicitly handle the following scenarios:
+
+Empty Ports: If the ships array has a length of 0, your loop will not execute. Your code must not crash; it should simply print the failure message ("Container [weight] -> Failed").
+
+Exact Capacity Match: A container can be loaded onto a ship even if its weight exactly matches the ship's free space (leaving 0.0 free space). Make sure to use the >= operator, not just >.
+
+Continuous Loading: If multiple containers are assigned in a row, your Ship class must correctly update and store its currentLoad so the next container sees the reduced free space.
+
+Null Elements: The array will contain null elements. You must explicitly check if (ships[i] != null) before accessing the ship's type or calculating its free space.
+
+Implementation Notes
+No Inner Classes: Do not define Ship or Container inside the PortSimulation class.
+
+Do not use advanced collections (like Lists); stick strictly to standard array operations.
+
+Use local variables (e.g., a bestShip variable and a maxSpace tracker) inside your method to remember the best vessel found during the loop.
+
+Ensure you check for both null elements and type mismatches before calculating space.
+
+=== SCENARIO 1: Best Fit Logic & Mixed Types (Tests T18, T27) ===
+Container 60.0 -> Ship 3
+
+=== SCENARIO 2: Type Mismatch (Test T19) ===
+Container 40.0 -> Failed
+
+=== SCENARIO 3: Capacity Limit & Exact Capacity (Tests T20, T21) ===
+Container 40.0 -> Ship 6
+Container 50.0 -> Failed
+Container 30.0 -> Ship 5
+
+=== SCENARIO 4: Null Ships & Empty Arrays (Tests T22, T23, T24) ===
+Container 10.0 -> Failed
+Container 30.0 -> Ship 7
+Container 10.0 -> Failed
+
+=== SCENARIO 5: Multiple Assignments Correct Load & Exceeding (Tests T25, T26) ===
+Container 50.0 -> Ship 8
+Container 40.0 -> Failed
+
+--- Final Status of All Used Ships ---
+Ship 1 [Type:1] Load:0.0/50.0
+Ship 2 [Type:2] Load:0.0/100.0
+Ship 3 [Type:1] Load:60.0/120.0
+Ship 4 [Type:2] Load:0.0/100.0
+Ship 5 [Type:1] Load:50.0/50.0
+Ship 6 [Type:1] Load:40.0/50.0
+Ship 7 [Type:1] Load:30.0/100.0
+Ship 8 [Type:1] Load:50.0/80.0
