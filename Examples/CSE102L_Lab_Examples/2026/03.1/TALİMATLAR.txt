@@ -1,0 +1,195 @@
+Space Mining Simulation
+Please read the class descriptions, edge cases, and scenarios carefully to complete your assignment successfully in the Moodle VPL environment.
+
+MiningRig Class
+The base class of our simulation. It represents a standard resource extraction structure placed on a 2D planetary map.
+
+Attributes:
+
+
+x (double): The X-coordinate of the mining rig on the map.
+
+
+
+y (double): The Y-coordinate of the rig on the map.
+
+
+
+maxRadius (double): The maximum operational reach of the rig.
+
+
+
+baseExtraction (int): The standard amount of mass the rig can mine per cycle before any modifiers.
+
+
+Methods:
+
+
+MiningRig(double x, double y, double maxRadius, int baseExtraction)
+
+
+
+Description: The constructor initializes a new mining rig with the given coordinates, operational radius, and base extraction power.
+
+
+
+calculateDistance(double targetX, double targetY) returning double
+
+
+
+Description: Calculates the Euclidean distance between the rig and the target rock's coordinates using the standard mathematical distance formula: 
+Math.sqrt(Math.pow(targetX - x, 2) + Math.pow(targetY - y, 2))
+
+Crucial Detail: This calculation must be robust enough to handle negative coordinates flawlessly. Additionally, if a rock is positioned exactly at the rig's coordinates, the distance evaluates to exactly 0.0.
+
+
+
+canReach(double targetX, double targetY) returning boolean
+
+
+
+Description: Evaluates if a target rock is within the rig's operational radius.
+
+
+
+Crucial Detail: This check is inclusive. A rock located exactly on the border of the maximum radius is considered a valid target and can be mined. Targets mathematically outside this border must return false.
+
+
+
+getBaseExtraction() returning int
+
+
+
+Description: Returns the base extraction power of the rig.
+
+
+PlasmaMiner Class
+This class inherits from the MiningRig class. It represents a specialized, high-yield mining rig with limited energy and a cyclic overcharge capability.
+
+Additional Attributes:
+
+
+energyLevel (int): The current energy available for the rig to operate.
+
+
+
+overchargeMultiplier (int): The multiplier applied to the extraction power during an overcharged cycle.
+
+
+
+drillCycles (int): A private counter tracking how many extraction cycles the rig has performed (starts at 0).
+
+
+Methods:
+
+
+PlasmaMiner(double x, double y, double maxRadius, int baseExtraction, int energyLevel, int overchargeMultiplier)
+
+
+
+Description: Initializes the base attributes by calling the parent constructor, and sets up the plasma-miner-specific attributes.
+
+
+
+extract(double targetX, double targetY, int rockHardness) returning int
+
+
+
+Description: Handles the extraction mechanism.
+
+
+
+Energy Conservation: If the rock is out of reach, or if the rig has 0 energy, the method must return 0 extraction power without consuming any energy.
+
+
+
+Mining Logic: If successful, it consumes exactly one energy point and increments the drillCycles. The rock's hardness is subtracted from the total extraction power. If the hardness exceeds the extraction power, the resulting yield defaults to 0 (preventing negative extraction).
+
+
+
+Base Integrity: Crucial Rule: Applying rock hardness must never permanently alter the rig's fundamental baseExtraction attribute.
+
+
+
+Overcharge Mechanic: Every 4th drill cycle (e.g., 4th, 8th, 12th) triggers an overcharge. This multiplies the base extraction power by the overchargeMultiplier before the rock's hardness is deducted. This cycle tracking is independent of energy levels or recharges.
+
+
+
+recharge(int energyToAdd) returning void
+
+
+
+Description: Restores the rig's energy incrementally using a loop until the requested amount is added. Passing a value of 0 is a valid operation and will simply result in the energy level remaining unchanged.
+
+
+
+processMinerals(double[][] rocks) returning int
+
+
+
+Description: The core operational cycle. It accepts a 2D array of rocks, where each rock is represented as [x, y, hardness, mass].
+
+
+
+Processing Logic: The method iterates through all rocks. Out-of-reach rocks are skipped entirely without wasting energy. If within reach, the rig drills repeatedly until the rock's mass is depleted.
+
+
+
+Auto-Recharge Check: If the energy level drops to exactly 0 during an active processing loop, the rig automatically calls the recharge method for exactly 4 energy points and continues drilling.
+
+
+
+Depletion Conditions: A rock is considered successfully cleared if its mass drops to exactly 0, or drops below 0.
+
+
+
+Infinite Loop Protection: If the rig's drill yields 0 mass (e.g., due to impenetrable rock hardness), the rig must cease drilling immediately after the first failed attempt, break the loop for that specific rock to prevent an infinite cycle, and conserve its remaining energy.
+
+
+Edge Cases & Simulation Scenarios
+When writing your code, your logic will be tested against standard asteroid fields as well as very specific edge cases. Make sure your loops and condition statements cover the following:
+
+
+The Empty Sector Array: The rig is activated, but the provided 2D array of rocks is completely empty. The rig should gracefully handle the empty array without crashing, perform no actions, and return 0 cleared rocks.
+
+
+
+The Impenetrable Rock (Infinite Loop Prevention): A rock enters the operational radius but possesses a hardness rating much higher than the rig's maximum overcharged extraction power. The rig will attempt its first drill cycle, calculate 0 yield due to the extreme hardness, and the safety mechanism must trigger immediately. It stops drilling that invincible rock and moves on to the next one in the array, conserving its energy.
+
+
+
+Scattered Debris Field (Array Integrity): A complex array of rocks is passed to the rig. Some are out of bounds, some are invincible, and some are valid targets. The rig must systematically evaluate each rock, skipping the out-of-range coordinates entirely without throwing errors or wasting energy, and safely clear the valid ones while auto-recharging when necessary.
+
+
+
+Overkill Extraction: A rock has only 5 mass remaining, but the rig's current cycle (perhaps an overcharge) yields 40 extraction power. The rock's remaining mass will drop into negative numbers. Your system must recognize this "overkill" as a successfully cleared rock and increment the counter.
+
+
+Final Checklist for VPL
+
+
+[ ] Inheritance Initialization: Did you properly utilize super() to initialize the base attributes in the PlasmaMiner constructor?
+
+
+
+[ ] Border Inclusivity: Does your canReach method correctly identify rocks located exactly on the maximum radius border as valid targets?
+
+
+
+[ ] Attribute Protection: Does the extract method ensure that extreme rock hardness prevents negative extraction yield without permanently modifying the rig's fundamental baseExtraction attribute?
+
+
+
+[ ] Order of Operations: Does the overcharge mechanic correctly apply on every 4th drill cycle before the rock's hardness is subtracted?
+
+
+
+[ ] Resource Conservation: Does processMinerals skip out-of-reach rocks entirely without wasting the rig's energy level?
+
+
+
+[ ] Infinite Loop Prevention: Does processMinerals immediately halt drilling on a specific rock if a cycle yields exactly 0 mass, preventing an endless loop against impenetrable rocks?
+
+
+
+[ ] Overkill Recognition: Does your logic correctly register a rock as cleared if the final massive extraction cycle pushes its remaining mass into negative numbers?
